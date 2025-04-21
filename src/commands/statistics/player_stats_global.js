@@ -5,7 +5,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const Fuse = require('fuse.js');
-const { pgRR } = require('../../pgClient');
+const { pg } = require('../../pgClient');
 const path = require('path');
 const { Resvg } = require('@resvg/resvg-js');
 
@@ -16,8 +16,8 @@ const retrievePlayerNames = async () => {
     let playerNames;
     const retrievePlayers = 'SELECT GamerTag, PlayerID FROM Players';
     try {
-        await pgRR.connect();
-        playerNames = await pgRR.query(retrievePlayers);
+        await pg.connect();
+        playerNames = await pg.query(retrievePlayers);
     } catch (err) {
         console.error('Error connecting to PostgreSQL database: ', err);
     }
@@ -92,8 +92,8 @@ module.exports = {
     global: true,
     category: 'statistics',
     data: new SlashCommandBuilder()
-        .setName('player_stats')
-        .setDescription('Retrieve players stats')
+        .setName('player_stats_global')
+        .setDescription('Retrieve global players stats')
         .addStringOption((option) =>
             option
                 .setName('player')
@@ -113,7 +113,7 @@ module.exports = {
             )
             .toString();
         const playerID = interaction.options.getString('player');
-        const res = await pgRR.query(query, [playerID]);
+        const res = await pg.query(query, [playerID]);
         if (res.rows[0]) {
             let pfp;
             if (res.rows[0].profilepicture) {
@@ -139,9 +139,7 @@ module.exports = {
                     name: `Requested By: ${user.tag}`,
                     iconURL: avatarURL,
                 })
-                .setTitle(
-                    `Rainier Rushdown Player Statistics - ${res.rows[0].gamertag}`
-                )
+                .setTitle(`Global Player Statistics - ${res.rows[0].gamertag}`)
                 .setThumbnail(`attachment://${playerID}.png`)
                 .addFields(
                     {

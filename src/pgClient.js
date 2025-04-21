@@ -10,4 +10,12 @@ const pg = new PG.Pool({
     port: process.env.PGPORT,
 });
 
-module.exports = pg;
+const pgRR = new PG.Pool({
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASERR,
+    port: process.env.PGPORT,
+});
+
+module.exports = { pg, pgRR };
